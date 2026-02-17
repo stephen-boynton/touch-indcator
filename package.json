@@ -20,7 +20,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "dev": "bun run index.ts"
+    "dev": "concurrently --kill-others \"cd server && bun run start\" \" cd ./demo && bun run dev\""
   },
   "devDependencies": {
     "@types/bun": "latest",

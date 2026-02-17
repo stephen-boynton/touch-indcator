@@ -2,6 +2,7 @@
   "name": "touch-indicator-server",
   "version": "1.0.0",
   "type": "module",
+  "main": "index.ts",
   "scripts": {
     "start": "bun run index.ts",
     "dev": "bun --watch index.ts"
