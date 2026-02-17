@@ -1,0 +1,15 @@
+{
+  "name": "touch-indicator-examples",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "touch-control": "npx tsx playwright-touch.ts"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0"
+  }
+}

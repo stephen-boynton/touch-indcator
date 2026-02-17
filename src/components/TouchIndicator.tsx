@@ -1,23 +1,70 @@
+import type { FC } from 'react';
 import { useTouchIndicator } from '../hooks/useTouchIndicator';
-import type { ConnectionState } from '../types';
+import type { TouchData, ConnectionState } from '../types';
 
-interface TouchIndicatorProps {
-  wsUrl: string;
+export interface TouchIndicatorProps {
+  wsUrl?: string;
+  touchData?: TouchData | null;
+  connectionState?: ConnectionState;
   className?: string;
   style?: React.CSSProperties;
+  size?: number;
+  color?: string;
+  opacity?: number;
+  transitionDuration?: number;
+  show?: boolean;
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+  onError?: (error: Event) => void;
+  reconnectAttempts?: number;
+  reconnectInterval?: number;
 }
 
-export function TouchIndicator({ wsUrl, className, style }: TouchIndicatorProps) {
-  const { connectionState, lastTouch } = useTouchIndicator({ wsUrl });
+export const TouchIndicator: FC<TouchIndicatorProps> = ({
+  wsUrl,
+  touchData: externalTouchData,
+  connectionState: externalConnectionState,
+  className,
+  style,
+  size = 20,
+  color = 'rgba(0, 0, 0, 0.5)',
+  opacity = 1,
+  transitionDuration = 0,
+  show = true,
+  onConnect,
+  onDisconnect,
+  onError,
+  reconnectAttempts,
+  reconnectInterval,
+}) => {
+  const useExternalSource = externalTouchData !== undefined;
 
-  const positionStyle: React.CSSProperties = lastTouch
+  const { connectionState, lastTouch } = useExternalSource
+    ? { connectionState: externalConnectionState || 'disconnected', lastTouch: externalTouchData }
+    : useTouchIndicator({
+        wsUrl: wsUrl || 'ws://localhost:8080',
+        onConnect,
+        onDisconnect,
+        onError,
+        reconnectAttempts,
+        reconnectInterval,
+      });
+
+  const isVisible = show && lastTouch !== null;
+
+  const positionStyle: React.CSSProperties = isVisible
     ? {
         position: 'fixed' as const,
         left: lastTouch.x,
         top: lastTouch.y,
         transform: 'translate(-50%, -50%)',
+        transition: transitionDuration > 0 ? `all ${transitionDuration}ms ease-out` : 'none',
+        opacity: opacity,
       }
-    : {};
+    : {
+        opacity: 0,
+        transition: transitionDuration > 0 ? `opacity ${transitionDuration}ms ease-out` : 'none',
+      };
 
   return (
     <div
@@ -25,13 +72,14 @@ export function TouchIndicator({ wsUrl, className, style }: TouchIndicatorProps)
       style={{
         ...style,
         ...positionStyle,
-        width: 20,
-        height: 20,
+        width: size,
+        height: size,
         borderRadius: '50%',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: color,
         pointerEvents: 'none',
+        willChange: 'left, top, opacity',
       }}
       data-connection-state={connectionState}
     />
   );
-}
+};
