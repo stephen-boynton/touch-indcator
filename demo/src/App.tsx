@@ -138,17 +138,6 @@ function App() {
           )}
         </div>
 
-        {mode === 'display' && (
-          <div className="debug-info">
-            <h3>Last Touch Data:</h3>
-            {lastMessage ? (
-              <pre>{JSON.stringify(lastMessage, null, 2)}</pre>
-            ) : (
-              <p className="no-data">No touch data received yet</p>
-            )}
-          </div>
-        )}
-
         {mode === 'sender' && (
           <div className="debug-info">
             <h3>Instructions:</h3>

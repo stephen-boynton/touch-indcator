@@ -19,7 +19,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc && cp src/components/TouchIndicator.css dist/components/",
     "dev": "concurrently --kill-others \"cd server && bun run start\" \" cd ./demo && bun run dev\""
   },
   "devDependencies": {

@@ -1,6 +1,8 @@
 import type { ServerWebSocket } from 'bun';
+import { createLogger } from '../src/lib/logger';
 
 const clients = new Set<ServerWebSocket<unknown>>();
+const logger = createLogger('WebSocketServer');
 
 const server = Bun.serve({
   port: 8080,
@@ -22,11 +24,11 @@ const server = Bun.serve({
   websocket: {
     open(ws) {
       clients.add(ws);
-      console.log(`Client connected. Total clients: ${clients.size}`);
+      logger.info(`Client connected. Total clients: ${clients.size}`);
     },
     message(ws, message) {
       const data = message.toString();
-      console.log(`Received: ${data}`);
+      logger.debug(`Received: ${data}`);
 
       for (const client of clients) {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
@@ -36,7 +38,7 @@ const server = Bun.serve({
     },
     close(ws) {
       clients.delete(ws);
-      console.log(`Client disconnected. Total clients: ${clients.size}`);
+      logger.info(`Client disconnected. Total clients: ${clients.size}`);
     },
   },
 });
