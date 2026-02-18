@@ -1,10 +1,12 @@
 import type { FC } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTouchIndicator } from '../hooks/useTouchIndicator';
-import type { TouchData, ConnectionState } from '../types';
+import type { ConnectionState, TouchMessage } from '../types';
+import { applySensitivity, clampPosition } from '../lib';
 
 export interface TouchIndicatorProps {
   wsUrl?: string;
-  touchData?: TouchData | null;
+  message?: TouchMessage | null;
   connectionState?: ConnectionState;
   className?: string;
   style?: React.CSSProperties;
@@ -13,6 +15,7 @@ export interface TouchIndicatorProps {
   opacity?: number;
   transitionDuration?: number;
   show?: boolean;
+  sensitivity?: number;
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
@@ -22,7 +25,7 @@ export interface TouchIndicatorProps {
 
 export const TouchIndicator: FC<TouchIndicatorProps> = ({
   wsUrl,
-  touchData: externalTouchData,
+  message: externalMessage,
   connectionState: externalConnectionState,
   className,
   style,
@@ -31,16 +34,20 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
   opacity = 1,
   transitionDuration = 0,
   show = true,
+  sensitivity = 1.8,
   onConnect,
   onDisconnect,
   onError,
   reconnectAttempts,
   reconnectInterval,
 }) => {
-  const useExternalSource = externalTouchData !== undefined;
+  const useExternalSource = externalMessage !== undefined;
 
-  const { connectionState, lastTouch } = useExternalSource
-    ? { connectionState: externalConnectionState || 'disconnected', lastTouch: externalTouchData }
+  const { connectionState, lastMessage } = useExternalSource
+    ? {
+        connectionState: externalConnectionState || 'disconnected',
+        lastMessage: externalMessage,
+      }
     : useTouchIndicator({
         wsUrl: wsUrl || 'ws://localhost:8080',
         onConnect,
@@ -50,13 +57,51 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
         reconnectInterval,
       });
 
-  const isVisible = show && lastTouch !== null;
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    const msg = useExternalSource ? externalMessage : lastMessage;
+    if (!msg) {
+      return;
+    }
+
+    if (msg.phase === 'start' || msg.phase === 'tap') {
+      if (!isInitialized.current) {
+        isInitialized.current = true;
+      }
+      return;
+    }
+
+    if (msg.phase === 'move') {
+      const scaled = applySensitivity(msg.dx, msg.dy, sensitivity);
+
+      setPosition(prev => {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        const newPos = {
+          x: prev.x + scaled.dx,
+          y: prev.y + scaled.dy,
+        };
+
+        return clampPosition(
+          newPos.x,
+          newPos.y,
+          { width: viewportWidth, height: viewportHeight },
+          size
+        );
+      });
+    }
+  }, [lastMessage, externalMessage, useExternalSource, sensitivity, size]);
+
+  const isVisible = show && (lastMessage !== null || isInitialized.current);
 
   const positionStyle: React.CSSProperties = isVisible
     ? {
         position: 'fixed' as const,
-        left: lastTouch.x,
-        top: lastTouch.y,
+        left: position.x,
+        top: position.y,
         transform: 'translate(-50%, -50%)',
         transition: transitionDuration > 0 ? `all ${transitionDuration}ms ease-out` : 'none',
         opacity: opacity,

@@ -11,6 +11,8 @@ This is a React library for receiving and displaying touch indicator data via We
 - **Linting**: ESLint 9 (flat config)
 - **Formatting**: Prettier
 
+> **Note:** If working on touch tracking logic, see [docs/TRACKING.md](./docs/TRACKING.md) for the tracking philosophy and implementation details.
+
 ## Commands
 
 ```bash
@@ -91,8 +93,8 @@ import { useState, useCallback, useEffect } from 'react';
 import type { FC } from 'react';
 
 import { useTouchIndicator } from './hooks/useTouchIndicator';
-import type { TouchData, ConnectionState } from './types';
-import { formatTouchData } from './lib/utils';
+import type { TouchMessage, ConnectionState } from './types';
+import { applySensitivity, clampPosition } from './lib';
 ```
 
 ### Formatting (Prettier)

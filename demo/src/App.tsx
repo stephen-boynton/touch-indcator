@@ -14,22 +14,22 @@ function App() {
   const [showIndicator, setShowIndicator] = useState(true);
   const [mode, setMode] = useState<Mode>('display');
   const wsRef = useRef<WebSocket | null>(null);
+  const lastTouchRef = useRef<{ x: number; y: number } | null>(null);
 
-  const { connectionState, lastTouch, connect, disconnect } = useTouchIndicator({
+  const { connectionState, lastMessage, connect, disconnect } = useTouchIndicator({
     wsUrl,
     onConnect: () => console.log('Connected'),
     onDisconnect: () => console.log('Disconnected'),
     onError: error => console.error('WebSocket error:', error),
   });
 
-  const sendTouch = useCallback((type: 'move' | 'tap', x: number, y: number) => {
+  const sendTouch = useCallback((phase: 'start' | 'move' | 'tap', dx: number, dy: number) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(
         JSON.stringify({
-          type,
-          x,
-          y,
-          timestamp: Date.now(),
+          phase,
+          dx,
+          dy,
         })
       );
     }
@@ -50,13 +50,20 @@ function App() {
   const handleTouchStart = (e: React.TouchEvent) => {
     if (mode !== 'sender') return;
     const touch = e.touches[0];
-    sendTouch('tap', touch.clientX, touch.clientY);
+    lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+    sendTouch('tap', 0, 0);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (mode !== 'sender') return;
     const touch = e.touches[0];
-    sendTouch('move', touch.clientX, touch.clientY);
+
+    if (lastTouchRef.current) {
+      const dx = touch.clientX - lastTouchRef.current.x;
+      const dy = touch.clientY - lastTouchRef.current.y;
+      sendTouch('move', dx, dy);
+      lastTouchRef.current = { x: touch.clientX, y: touch.clientY };
+    }
   };
 
   const handleReconnect = () => {
@@ -134,8 +141,8 @@ function App() {
         {mode === 'display' && (
           <div className="debug-info">
             <h3>Last Touch Data:</h3>
-            {lastTouch ? (
-              <pre>{JSON.stringify(lastTouch, null, 2)}</pre>
+            {lastMessage ? (
+              <pre>{JSON.stringify(lastMessage, null, 2)}</pre>
             ) : (
               <p className="no-data">No touch data received yet</p>
             )}
@@ -153,7 +160,7 @@ function App() {
       </main>
 
       {mode === 'display' && showIndicator && (
-        <TouchIndicator wsUrl={wsUrl} touchData={lastTouch} connectionState={connectionState} />
+        <TouchIndicator wsUrl={wsUrl} message={lastMessage} connectionState={connectionState} />
       )}
     </div>
   );

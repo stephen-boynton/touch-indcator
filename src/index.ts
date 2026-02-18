@@ -3,17 +3,12 @@ export type { TouchIndicatorProps } from './components/TouchIndicator';
 export { useTouchIndicator } from './hooks/useTouchIndicator';
 export type { UseTouchIndicatorOptions, UseTouchIndicatorReturn } from './hooks/useTouchIndicator';
 export type {
-  TouchData,
-  TouchEvent,
+  TouchPhase,
+  TouchDelta,
+  TouchMessage,
   ConnectionState,
   TouchIndicatorError,
   WebSocketMessage,
 } from './types';
 export { createTouchIndicatorError } from './types';
-export {
-  isValidTouchData,
-  normalizeCoordinates,
-  clamp,
-  calculateDistance,
-  calculateVelocity,
-} from './lib';
+export { clamp, applySensitivity, clampPosition } from './lib';

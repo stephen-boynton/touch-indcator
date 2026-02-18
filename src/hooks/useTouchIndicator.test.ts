@@ -1,156 +1,99 @@
-import { describe, test, expect, beforeEach, afterEach, jest } from 'bun:test';
-import {
-  isValidTouchData,
-  clamp,
-  normalizeCoordinates,
-  calculateDistance,
-  calculateVelocity,
-} from '../lib';
+import { describe, test, expect } from 'bun:test';
 
-describe('useTouchIndicator', () => {
-  let originalWebSocket: typeof WebSocket;
+describe('TouchIndicator lib utilities', () => {
+  describe('applySensitivity', () => {
+    test('multiplies dx and dy by sensitivity', async () => {
+      const { applySensitivity } = await import('../lib');
 
-  beforeEach(() => {
-    originalWebSocket = global.WebSocket;
+      const result = applySensitivity(10, 20, 2);
+
+      expect(result).toEqual({ dx: 20, dy: 40 });
+    });
+
+    test('handles sensitivity of 1', async () => {
+      const { applySensitivity } = await import('../lib');
+
+      const result = applySensitivity(5, 10, 1);
+
+      expect(result).toEqual({ dx: 5, dy: 10 });
+    });
+
+    test('handles fractional sensitivity', async () => {
+      const { applySensitivity } = await import('../lib');
+
+      const result = applySensitivity(10, 20, 0.5);
+
+      expect(result).toEqual({ dx: 5, dy: 10 });
+    });
+
+    test('handles negative values', async () => {
+      const { applySensitivity } = await import('../lib');
+
+      const result = applySensitivity(-10, 20, 1.5);
+
+      expect(result).toEqual({ dx: -15, dy: 30 });
+    });
   });
 
-  afterEach(() => {
-    global.WebSocket = originalWebSocket;
+  describe('clamp', () => {
+    test('returns value when within range', async () => {
+      const { clamp } = await import('../lib');
+
+      expect(clamp(5, 0, 10)).toBe(5);
+    });
+
+    test('returns min when value is below range', async () => {
+      const { clamp } = await import('../lib');
+
+      expect(clamp(-5, 0, 10)).toBe(0);
+    });
+
+    test('returns max when value is above range', async () => {
+      const { clamp } = await import('../lib');
+
+      expect(clamp(15, 0, 10)).toBe(10);
+    });
   });
 
-  test('starts in disconnected state', () => {
-    const mockWs = {
-      readyState: 0,
-      close: jest.fn(),
-      onopen: null,
-      onmessage: null,
-      onerror: null,
-      onclose: null,
-    };
+  describe('clampPosition', () => {
+    test('returns original position when within bounds', async () => {
+      const { clampPosition } = await import('../lib');
 
-    global.WebSocket = jest.fn(() => mockWs) as unknown as typeof WebSocket;
+      const result = clampPosition(100, 200, { width: 1000, height: 800 }, 20);
 
-    expect(true).toBe(true);
-  });
-});
+      expect(result).toEqual({ x: 100, y: 200 });
+    });
 
-describe('isValidTouchData', () => {
-  test('returns true for valid TouchData', () => {
-    const validData = {
-      x: 100,
-      y: 200,
-      timestamp: Date.now(),
-    };
-    expect(isValidTouchData(validData)).toBe(true);
-  });
+    test('clamps x to left boundary', async () => {
+      const { clampPosition } = await import('../lib');
 
-  test('returns true for valid TouchData with optional fields', () => {
-    const validData = {
-      x: 100,
-      y: 200,
-      timestamp: Date.now(),
-      pressure: 0.5,
-      touchId: 1,
-    };
-    expect(isValidTouchData(validData)).toBe(true);
-  });
+      const result = clampPosition(5, 200, { width: 1000, height: 800 }, 20);
 
-  test('returns false for null', () => {
-    expect(isValidTouchData(null)).toBe(false);
-  });
+      expect(result).toEqual({ x: 10, y: 200 });
+    });
 
-  test('returns false for undefined', () => {
-    expect(isValidTouchData(undefined)).toBe(false);
-  });
+    test('clamps x to right boundary', async () => {
+      const { clampPosition } = await import('../lib');
 
-  test('returns false for missing x', () => {
-    expect(isValidTouchData({ y: 100, timestamp: Date.now() })).toBe(false);
-  });
+      const result = clampPosition(995, 200, { width: 1000, height: 800 }, 20);
 
-  test('returns false for missing y', () => {
-    expect(isValidTouchData({ x: 100, timestamp: Date.now() })).toBe(false);
-  });
+      expect(result).toEqual({ x: 990, y: 200 });
+    });
 
-  test('returns false for missing timestamp', () => {
-    expect(isValidTouchData({ x: 100, y: 200 })).toBe(false);
-  });
+    test('clamps y to top boundary', async () => {
+      const { clampPosition } = await import('../lib');
 
-  test('returns false for invalid x type', () => {
-    expect(isValidTouchData({ x: '100', y: 200, timestamp: Date.now() })).toBe(false);
-  });
+      const result = clampPosition(100, 5, { width: 1000, height: 800 }, 20);
 
-  test('returns false for invalid pressure', () => {
-    expect(
-      isValidTouchData({
-        x: 100,
-        y: 200,
-        timestamp: Date.now(),
-        pressure: 'high' as unknown as number,
-      })
-    ).toBe(false);
-  });
-});
+      expect(result).toEqual({ x: 100, y: 10 });
+    });
 
-describe('clamp', () => {
-  test('returns value when within range', () => {
-    expect(clamp(5, 0, 10)).toBe(5);
-  });
+    test('clamps y to bottom boundary', async () => {
+      const { clampPosition } = await import('../lib');
 
-  test('returns min when value is below', () => {
-    expect(clamp(-5, 0, 10)).toBe(0);
-  });
+      const result = clampPosition(100, 795, { width: 1000, height: 800 }, 20);
 
-  test('returns max when value is above', () => {
-    expect(clamp(15, 0, 10)).toBe(10);
-  });
-
-  test('works with negative ranges', () => {
-    expect(clamp(0, -10, -5)).toBe(-5);
-  });
-});
-
-describe('normalizeCoordinates', () => {
-  test('returns same coordinates within bounds', () => {
-    const result = normalizeCoordinates(100, 200, { width: 1000, height: 1000 });
-    expect(result.normalizedX).toBe(100);
-    expect(result.normalizedY).toBe(200);
-  });
-
-  test('clamps coordinates above bounds', () => {
-    const result = normalizeCoordinates(1500, 2000, { width: 1000, height: 1000 });
-    expect(result.normalizedX).toBe(1000);
-    expect(result.normalizedY).toBe(1000);
-  });
-
-  test('clamps negative coordinates', () => {
-    const result = normalizeCoordinates(-100, -200, { width: 1000, height: 1000 });
-    expect(result.normalizedX).toBe(0);
-    expect(result.normalizedY).toBe(0);
-  });
-});
-
-describe('calculateDistance', () => {
-  test('returns 0 for same point', () => {
-    const touch = { x: 100, y: 100, timestamp: Date.now() };
-    expect(calculateDistance(touch, touch)).toBe(0);
-  });
-
-  test('calculates correct distance', () => {
-    const touch1 = { x: 0, y: 0, timestamp: 0 };
-    const touch2 = { x: 3, y: 4, timestamp: 1000 };
-    expect(calculateDistance(touch1, touch2)).toBe(5);
-  });
-});
-
-describe('calculateVelocity', () => {
-  test('returns 0 for same timestamp', () => {
-    const touch = { x: 100, y: 100, timestamp: 1000 };
-    expect(calculateVelocity(touch, touch)).toBe(0);
-  });
-
-  test('calculates correct velocity', () => {
-    const touch1 = { x: 0, y: 0, timestamp: 0 };
-    const touch2 = { x: 100, y: 0, timestamp: 1000 };
-    expect(calculateVelocity(touch1, touch2)).toBe(0.1);
+      expect(result).toEqual({ x: 100, y: 790 });
+    });
   });
 });

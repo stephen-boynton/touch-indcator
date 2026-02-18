@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import type { TouchData, ConnectionState } from '../types';
+import type { ConnectionState, TouchMessage, TouchPhase } from '../types';
 
 export interface UseTouchIndicatorOptions {
   wsUrl: string;
@@ -12,8 +12,8 @@ export interface UseTouchIndicatorOptions {
 
 export interface UseTouchIndicatorReturn {
   connectionState: ConnectionState;
-  lastTouch: TouchData | null;
-  isConnected: boolean;
+  lastMessage: TouchMessage | null;
+  isDragging: boolean;
   connect: () => void;
   disconnect: () => void;
 }
@@ -34,27 +34,53 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectCountRef = useRef(0);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastPhaseRef = useRef<TouchPhase | null>(null);
 
   const connectionStateRef = useRef<ConnectionState>('disconnected');
-  const lastTouchRef = useRef<TouchData | null>(null);
+  const lastMessageRef = useRef<TouchMessage | null>(null);
 
   const [, setStateTrigger] = useState(0);
 
   const updateState = useCallback(
-    (connectionState: ConnectionState, lastTouch: TouchData | null) => {
+    (connectionState: ConnectionState, message: TouchMessage | null) => {
       connectionStateRef.current = connectionState;
-      lastTouchRef.current = lastTouch;
+      lastMessageRef.current = message;
+      if (message) {
+        lastPhaseRef.current = message.phase;
+      }
       setStateTrigger(n => n + 1);
     },
     []
   );
+
+  const parseMessage = (data: unknown): TouchMessage | null => {
+    if (typeof data !== 'object' || data === null) {
+      return null;
+    }
+
+    const obj = data as Record<string, unknown>;
+
+    const phase = obj.phase as TouchPhase | undefined;
+    if (!phase || !['start', 'move', 'tap'].includes(phase)) {
+      return null;
+    }
+
+    const dx = obj.dx as number | undefined;
+    const dy = obj.dy as number | undefined;
+
+    if (typeof dx !== 'number' || typeof dy !== 'number') {
+      return null;
+    }
+
+    return { phase, dx, dy };
+  };
 
   const connect = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       return;
     }
 
-    updateState('connecting', lastTouchRef.current);
+    updateState('connecting', lastMessageRef.current);
 
     try {
       const ws = new WebSocket(wsUrl);
@@ -62,14 +88,18 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
 
       ws.onopen = () => {
         reconnectCountRef.current = 0;
-        updateState('connected', lastTouchRef.current);
+        updateState('connected', lastMessageRef.current);
         onConnect?.();
       };
 
       ws.onmessage = event => {
         try {
-          const data = JSON.parse(event.data) as TouchData;
-          updateState(connectionStateRef.current, data);
+          const data = JSON.parse(event.data);
+          const message = parseMessage(data);
+
+          if (message) {
+            updateState(connectionStateRef.current, message);
+          }
         } catch {
           console.warn('Invalid touch data received');
         }
@@ -80,7 +110,7 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
       };
 
       ws.onclose = () => {
-        updateState('disconnected', lastTouchRef.current);
+        updateState('disconnected', lastMessageRef.current);
         onDisconnect?.();
 
         if (reconnectCountRef.current < reconnectAttempts) {
@@ -90,11 +120,11 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
             connect();
           }, delay);
         } else {
-          updateState('error', lastTouchRef.current);
+          updateState('error', lastMessageRef.current);
         }
       };
     } catch {
-      updateState('error', lastTouchRef.current);
+      updateState('error', lastMessageRef.current);
     }
   }, [wsUrl, onConnect, onDisconnect, onError, reconnectAttempts, reconnectInterval, updateState]);
 
@@ -120,10 +150,12 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
     };
   }, [wsUrl]);
 
+  const isDragging = lastMessageRef.current?.phase === 'move';
+
   return {
     connectionState: connectionStateRef.current,
-    lastTouch: lastTouchRef.current,
-    isConnected: connectionStateRef.current === 'connected',
+    lastMessage: lastMessageRef.current,
+    isDragging,
     connect,
     disconnect,
   };
