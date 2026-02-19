@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/stephen-boynton/touch-indcator/compare/v1.0.3...v1.0.4) (2026-02-19)
+
+
+### Bug Fixes
+
+* no op release ([6b4fadb](https://github.com/stephen-boynton/touch-indcator/commit/6b4fadbccb0c5ace1d098aee77d0e12b964ecaf3))
+
 ## [1.0.3](https://github.com/stephen-boynton/touch-indcator/compare/v1.0.2...v1.0.3) (2026-02-19)
 
 
