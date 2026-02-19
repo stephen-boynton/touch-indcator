@@ -1,0 +1,23 @@
+# 1.0.0 (2026-02-19)
+
+
+### Bug Fixes
+
+* add permissions ([aaefecf](https://github.com/stephen-boynton/touch-indcator/commit/aaefecf9b491dd64a3db937f5a04516cd1f8f57e))
+* build with bun ([04ba185](https://github.com/stephen-boynton/touch-indcator/commit/04ba185358c0e94163b25365632576e25e8dc2bb))
+* npm issue ([c1da26e](https://github.com/stephen-boynton/touch-indcator/commit/c1da26ec72011f72a2f9cf2cd5a2f63989f756ab))
+* pipeline ([997fe70](https://github.com/stephen-boynton/touch-indcator/commit/997fe7094d3b6448ce0507dd58113dc597c8ac7d))
+* release hopefully ([9bdd044](https://github.com/stephen-boynton/touch-indcator/commit/9bdd044f33c2bc63433874d5d83290ba6aee22d9))
+* rely on bun ([736e953](https://github.com/stephen-boynton/touch-indcator/commit/736e953cdefa99a9e7a2b22b78d81efcfb5949ab))
+* save and push changes ([1ea9bda](https://github.com/stephen-boynton/touch-indcator/commit/1ea9bda693b058df56129c6c6db8080531fa77cf))
+* version ([4baa04a](https://github.com/stephen-boynton/touch-indcator/commit/4baa04ad4a54d2737cbdc8404fe8e5d90c5a5848))
+
+
+### Features
+
+* ci cd ([e010ce4](https://github.com/stephen-boynton/touch-indcator/commit/e010ce4937d8f818ab66f7c2e57503b0ce5b7eaa))
+* good tracking ([2c0ae6a](https://github.com/stephen-boynton/touch-indcator/commit/2c0ae6a29005e31acab2b388c744ed3929e628ad))
+* run dev with single command ([395f0d9](https://github.com/stephen-boynton/touch-indcator/commit/395f0d98c2265948751c844e63453ce3cfeefd39))
+* setup ([6fcbf93](https://github.com/stephen-boynton/touch-indcator/commit/6fcbf9362d1cc7f82a04f0ccee929d2c6f992e69))
+* tap feedback ([b3b26b9](https://github.com/stephen-boynton/touch-indcator/commit/b3b26b9157ad8a83306cca20be2700796945e8e7))
+* working demo ([55a4909](https://github.com/stephen-boynton/touch-indcator/commit/55a4909259af08fc6e095167461d32bb7875ce8e))
