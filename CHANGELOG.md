@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/stephen-boynton/touch-indcator/compare/v1.0.5...v1.1.0) (2026-02-19)
+
+
+### Features
+
+* updated release mech ([a097da5](https://github.com/stephen-boynton/touch-indcator/commit/a097da50c2c445fc86a081b8a0cf63a8a100ddf0))
+
 ## [1.0.5](https://github.com/stephen-boynton/touch-indcator/compare/v1.0.4...v1.0.5) (2026-02-19)
 
 
