@@ -13,17 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: '24	'
-          cache: 'npm'
+          bun-version: latest
 
-      - run: npm ci
+      - run: bun install
 
-      - run: npm run typecheck
+      - run: bun run typecheck
 
-      - run: npm run lint
+      - run: bun run lint
 
-      - run: npm run format:check
+      - run: bun run format:check
 
-      - run: npm test
+      - run: bun test
