@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.1...v1.1.2) (2026-02-19)
+
+
+### Bug Fixes
+
+* npm publish ([fb8e985](https://github.com/stephen-boynton/touch-indcator/commit/fb8e985379a2f6d205f4254781be93e8f09b9cde))
+
 ## [1.1.1](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.0...v1.1.1) (2026-02-19)
 
 
