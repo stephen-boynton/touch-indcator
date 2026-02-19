@@ -1,6 +1,6 @@
 {
-  "name": "touch-indicator",
-  "version": "1.0.5",
+  "name": "remote-touch-indicator",
+  "version": "1.0.4",
   "type": "module",
   "exports": {
     ".": {
