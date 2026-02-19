@@ -149,7 +149,7 @@ function App() {
       </main>
 
       {mode === 'display' && showIndicator && (
-        <TouchIndicator wsUrl={wsUrl} message={lastMessage} connectionState={connectionState} />
+        <TouchIndicator source={{ message: lastMessage, connectionState }} connection={{ wsUrl }} />
       )}
     </div>
   );

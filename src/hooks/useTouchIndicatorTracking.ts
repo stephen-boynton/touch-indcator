@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { applySensitivity, clampPosition } from '../lib';
+import { applySensitivity, clampPosition, createLogger } from '../lib';
 import type { UseTouchIndicatorTrackingOptions, UseTouchIndicatorTrackingReturn } from '../types';
+
+const logger = createLogger('TouchIndicator:Tracking');
 
 export type { UseTouchIndicatorTrackingOptions, UseTouchIndicatorTrackingReturn };
 
@@ -19,6 +21,7 @@ export function useTouchIndicatorTracking({
 
   useEffect(() => {
     if (disabled) {
+      logger.debug('Tracking disabled');
       return;
     }
 
@@ -30,9 +33,11 @@ export function useTouchIndicatorTracking({
     if (msg.phase === 'start' || msg.phase === 'tap') {
       if (!isInitialized.current) {
         isInitialized.current = true;
+        logger.debug('Tracking initialized');
       }
 
       if (msg.phase === 'tap') {
+        logger.debug('Tap detected');
         setIsTapping(true);
         onTap?.();
         setTimeout(() => setIsTapping(false), rippleDuration);
@@ -59,6 +64,7 @@ export function useTouchIndicatorTracking({
           size
         );
 
+        logger.debug('Position updated:', clamped);
         onMove?.(clamped);
 
         return clamped;

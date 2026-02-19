@@ -1,5 +1,8 @@
 import type { ConnectionState } from '../types';
 
+export { createLogger } from './logger';
+export type { Logger } from './logger';
+
 export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }

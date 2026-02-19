@@ -23,8 +23,12 @@
     "dev": "concurrently --kill-others \"cd server && bun run start\" \" cd ./demo && bun run dev\""
   },
   "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react": "^16.3.2",
     "@types/bun": "latest",
+    "@types/react-dom": "^19.2.3",
     "eslint": "^9.0.0",
+    "jest": "29",
     "prettier": "^3.0.0",
     "typescript-eslint": "^8.56.0"
   },

@@ -1,5 +1,8 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import type { ConnectionState, TouchMessage, TouchPhase } from '../types';
+import { createLogger } from '../lib';
+
+const logger = createLogger('TouchIndicator:WS');
 
 export interface UseTouchIndicatorOptions {
   wsUrl: string;
@@ -80,6 +83,7 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
       return;
     }
 
+    logger.debug('Connecting to', wsUrl);
     updateState('connecting', lastMessageRef.current);
 
     try {
@@ -87,6 +91,7 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
       wsRef.current = ws;
 
       ws.onopen = () => {
+        logger.info('Connected to', wsUrl);
         reconnectCountRef.current = 0;
         updateState('connected', lastMessageRef.current);
         onConnect?.();
@@ -98,37 +103,46 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
           const message = parseMessage(data);
 
           if (message) {
+            logger.debug('Received message:', message);
             updateState(connectionStateRef.current, message);
           }
         } catch {
-          console.warn('Invalid touch data received');
+          logger.debug('Invalid touch data received');
         }
       };
 
       ws.onerror = error => {
+        logger.error('WebSocket error:', error);
         onError?.(error);
       };
 
       ws.onclose = () => {
+        logger.debug('WebSocket closed');
         updateState('disconnected', lastMessageRef.current);
         onDisconnect?.();
 
         if (reconnectCountRef.current < reconnectAttempts) {
           reconnectCountRef.current++;
           const delay = reconnectInterval * Math.pow(2, reconnectCountRef.current - 1);
+          logger.debug(
+            `Reconnecting (attempt ${reconnectCountRef.current}/${reconnectAttempts}) in ${delay}ms`
+          );
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, delay);
         } else {
+          logger.error('Max reconnection attempts reached');
           updateState('error', lastMessageRef.current);
         }
       };
     } catch {
+      logger.error('Failed to create WebSocket');
       updateState('error', lastMessageRef.current);
     }
   }, [wsUrl, onConnect, onDisconnect, onError, reconnectAttempts, reconnectInterval, updateState]);
 
   const disconnect = useCallback(() => {
+    logger.debug('Disconnecting');
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
