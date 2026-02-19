@@ -77,6 +77,8 @@ export type UseTouchIndicatorTrackingOptions = {
   sensitivity?: number;
   size?: number;
   rippleDuration?: number;
+  tapDelay?: number;
+  tapMovementThreshold?: number;
   onTap?: () => void;
   onMove?: (position: { x: number; y: number }) => void;
 };
