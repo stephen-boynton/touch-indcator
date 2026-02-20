@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.2...v1.1.3) (2026-02-20)
+
+
+### Bug Fixes
+
+* token test ([bf11bd6](https://github.com/stephen-boynton/touch-indcator/commit/bf11bd6adececb4f2b65308266c5e4d94873c3cc))
+
 ## [1.1.2](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.1...v1.1.2) (2026-02-19)
 
 
