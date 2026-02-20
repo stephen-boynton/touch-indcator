@@ -10,7 +10,7 @@ import type {
   TouchIndicatorAnimation,
   ConnectionState,
 } from '../types';
-import './TouchIndicator.css';
+import * as styles from './TouchIndicator.module.css';
 
 export type {
   TouchIndicatorProps,
@@ -115,9 +115,7 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
 
   return (
     <>
-      {isTapping && (
-        <div className="touch-indicator-ripple" style={rippleStyle} data-ripple="true" />
-      )}
+      {isTapping && <div className={styles.ripple} style={rippleStyle} data-ripple="true" />}
       <div
         className={className}
         style={indicatorStyle}

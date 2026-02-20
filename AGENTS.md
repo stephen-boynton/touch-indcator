@@ -2,10 +2,6 @@
 
 This is a React library for receiving and displaying touch indicator data via WebSockets. The touch indicator mimics Apple's Magic Trackpad behavior on screen.
 
-## To Start
-
-Look in the ./memory folder for a title that might be related to the requested problem. If one seems to relate based on it's name, read that document and see if it helps give you perspective of the issue.
-
 ## Project Overview
 
 - **Type**: React TypeScript library
@@ -196,11 +192,3 @@ Before committing, run:
 ```bash
 bun run typecheck && bun run lint && bun run format:check && bun test
 ```
-
-## Wrapping Up
-
-Look in the ./memory folder and find the document with the highest number. Each document title is made of an increasing number and a two or three word title of what that memory contains. Using this format: <number>-<three-word-title>. For example: 008 - websocket-connection.
-
-Find the highest number in the file, then create a new memory using the next number above the highest number used in the file so far. For example, highest number: 023, new number: 024. Provide a short title, up to three words based on the subject matter of the memory.
-
-The body of the document should be a succinct description of what context you would need to pick up to understand the problem you are to solve.
