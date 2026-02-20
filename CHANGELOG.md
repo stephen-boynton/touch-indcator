@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.4...v1.1.5) (2026-02-20)
+
+
+### Bug Fixes
+
+* npm token again. ([5520a8e](https://github.com/stephen-boynton/touch-indcator/commit/5520a8e28615c88266e3b992500ed1bb6e2fa961))
+
 ## [1.1.4](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.3...v1.1.4) (2026-02-20)
 
 
