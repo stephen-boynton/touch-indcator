@@ -42,6 +42,20 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
   const connectionStateRef = useRef<ConnectionState>('disconnected');
   const lastMessageRef = useRef<TouchMessage | null>(null);
 
+  const onConnectRef = useRef(onConnect);
+  const onDisconnectRef = useRef(onDisconnect);
+  const onErrorRef = useRef(onError);
+  const reconnectAttemptsRef = useRef(reconnectAttempts);
+  const reconnectIntervalRef = useRef(reconnectInterval);
+
+  useEffect(() => {
+    onConnectRef.current = onConnect;
+    onDisconnectRef.current = onDisconnect;
+    onErrorRef.current = onError;
+    reconnectAttemptsRef.current = reconnectAttempts;
+    reconnectIntervalRef.current = reconnectInterval;
+  }, [onConnect, onDisconnect, onError, reconnectAttempts, reconnectInterval]);
+
   const [, setStateTrigger] = useState(0);
 
   const updateState = useCallback(
@@ -94,7 +108,7 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
         logger.info('Connected to', wsUrl);
         reconnectCountRef.current = 0;
         updateState('connected', lastMessageRef.current);
-        onConnect?.();
+        onConnectRef.current?.();
       };
 
       ws.onmessage = event => {
@@ -113,19 +127,19 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
 
       ws.onerror = error => {
         logger.error('WebSocket error:', error);
-        onError?.(error);
+        onErrorRef.current?.(error);
       };
 
       ws.onclose = () => {
         logger.debug('WebSocket closed');
         updateState('disconnected', lastMessageRef.current);
-        onDisconnect?.();
+        onDisconnectRef.current?.();
 
-        if (reconnectCountRef.current < reconnectAttempts) {
+        if (reconnectCountRef.current < reconnectAttemptsRef.current) {
           reconnectCountRef.current++;
-          const delay = reconnectInterval * Math.pow(2, reconnectCountRef.current - 1);
+          const delay = reconnectIntervalRef.current * Math.pow(2, reconnectCountRef.current - 1);
           logger.debug(
-            `Reconnecting (attempt ${reconnectCountRef.current}/${reconnectAttempts}) in ${delay}ms`
+            `Reconnecting (attempt ${reconnectCountRef.current}/${reconnectAttemptsRef.current}) in ${delay}ms`
           );
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
@@ -139,7 +153,7 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
       logger.error('Failed to create WebSocket');
       updateState('error', lastMessageRef.current);
     }
-  }, [wsUrl, onConnect, onDisconnect, onError, reconnectAttempts, reconnectInterval, updateState]);
+  }, [wsUrl, updateState]);
 
   const disconnect = useCallback(() => {
     logger.debug('Disconnecting');
@@ -147,14 +161,14 @@ export function useTouchIndicator(options: UseTouchIndicatorOptions): UseTouchIn
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
     }
-    reconnectCountRef.current = reconnectAttempts;
+    reconnectCountRef.current = reconnectAttemptsRef.current;
 
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
     }
     updateState('disconnected', null);
-  }, [reconnectAttempts, updateState]);
+  }, [updateState]);
 
   useEffect(() => {
     connect();
