@@ -53,9 +53,9 @@ describe('TouchIndicator', () => {
 
     test('renders with style', () => {
       const html = renderToStaticMarkup(
-        React.createElement(TouchIndicator, { style: { zIndex: 1000 } })
+        React.createElement(TouchIndicator, { style: { zIndex: 9999 } })
       );
-      expect(html).toContain('z-index:1000');
+      expect(html).toContain('z-index:9999');
     });
 
     test('renders with show false', () => {
