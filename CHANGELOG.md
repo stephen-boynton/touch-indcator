@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.6...v1.1.7) (2026-02-23)
+
+
+### Bug Fixes
+
+* unstable references ([#1](https://github.com/stephen-boynton/touch-indcator/issues/1)) ([de7cc15](https://github.com/stephen-boynton/touch-indcator/commit/de7cc15ac4a091e369f73225b6da8cd8ed01ebb8))
+
 ## [1.1.6](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.5...v1.1.6) (2026-02-20)
 
 
