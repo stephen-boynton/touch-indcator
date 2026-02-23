@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.9...v1.2.0) (2026-02-23)
+
+
+### Features
+
+* a big feature \n\n BREAKING CHANGE: it breaks something ([#6](https://github.com/stephen-boynton/touch-indcator/issues/6)) ([161e4c7](https://github.com/stephen-boynton/touch-indcator/commit/161e4c7a70227a1ce0bf19b637759cda8d911275))
+
 ## [1.1.9](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.8...v1.1.9) (2026-02-23)
 
 
