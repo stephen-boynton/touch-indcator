@@ -102,12 +102,6 @@ describe('TouchIndicator', () => {
   });
 
   describe('callbacks', () => {
-    test('renders with onTap callback without error', () => {
-      const onTap = () => {};
-      const html = renderToStaticMarkup(React.createElement(TouchIndicator, { onTap }));
-      expect(html).toContain('<div');
-    });
-
     test('renders with onMove callback without error', () => {
       const onMove = () => {};
       const html = renderToStaticMarkup(React.createElement(TouchIndicator, { onMove }));

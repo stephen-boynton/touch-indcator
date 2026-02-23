@@ -25,7 +25,6 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
   connection,
   visual,
   animation,
-  onTap,
   onMove,
   className,
   style,
@@ -73,13 +72,11 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
         reconnectInterval,
       });
 
-  const { position, isTapping, isInitialized } = useTouchIndicatorTracking({
+  const { position, phase, isInitialized } = useTouchIndicatorTracking({
     message: useExternalSource ? externalMessage : lastMessage,
     disabled,
     sensitivity,
     size,
-    rippleDuration,
-    onTap,
     onMove,
   });
 
@@ -88,7 +85,7 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
   const positionStyle = getPositionStyle({
     position,
     isVisible,
-    isTapping,
+    isTapping: phase === 'tap',
     visual: { size, color, opacity },
     animation: {
       transitionDuration,
@@ -102,7 +99,7 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
     positionStyle,
     visual: { size, color },
     connectionState,
-    isTapping,
+    isTapping: phase === 'tap',
     className,
     style,
   });
@@ -115,12 +112,12 @@ export const TouchIndicator: FC<TouchIndicatorProps> = ({
 
   return (
     <>
-      {isTapping && <div className={styles.ripple} style={rippleStyle} data-ripple="true" />}
+      {phase === 'tap' && <div className={styles.ripple} style={rippleStyle} data-ripple="true" />}
       <div
         className={className}
         style={indicatorStyle}
         data-connection-state={connectionState}
-        data-tapping={isTapping}
+        data-tapping={phase === 'tap'}
       />
     </>
   );

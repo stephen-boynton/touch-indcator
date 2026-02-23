@@ -63,7 +63,6 @@ export type TouchIndicatorProps = {
   connection?: TouchIndicatorConnection;
   visual?: TouchIndicatorVisual;
   animation?: TouchIndicatorAnimation;
-  onTap?: () => void;
   onMove?: (position: { x: number; y: number }) => void;
   className?: string;
   style?: React.CSSProperties;
@@ -76,15 +75,11 @@ export type UseTouchIndicatorTrackingOptions = {
   disabled?: boolean;
   sensitivity?: number;
   size?: number;
-  rippleDuration?: number;
-  tapDelay?: number;
-  tapMovementThreshold?: number;
-  onTap?: () => void;
   onMove?: (position: { x: number; y: number }) => void;
 };
 
 export type UseTouchIndicatorTrackingReturn = {
   position: { x: number; y: number };
-  isTapping: boolean;
+  phase: TouchPhase | null;
   isInitialized: boolean;
 };

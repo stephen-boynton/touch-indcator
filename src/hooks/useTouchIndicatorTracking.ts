@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { applySensitivity, clampPosition, createLogger } from '../lib';
-import type { UseTouchIndicatorTrackingOptions, UseTouchIndicatorTrackingReturn } from '../types';
+import type {
+  UseTouchIndicatorTrackingOptions,
+  UseTouchIndicatorTrackingReturn,
+  TouchPhase,
+} from '../types';
 
 const logger = createLogger('TouchIndicator:Tracking');
 
@@ -11,26 +15,17 @@ export function useTouchIndicatorTracking({
   disabled,
   sensitivity = 1.8,
   size = 20,
-  rippleDuration = 300,
-  tapDelay = 150,
-  tapMovementThreshold = 5,
-  onTap,
   onMove,
 }: UseTouchIndicatorTrackingOptions): UseTouchIndicatorTrackingReturn {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isTapping, setIsTapping] = useState(false);
+  const [phase, setPhase] = useState<TouchPhase | null>(null);
   const isInitialized = useRef(false);
-  const tapStartTime = useRef<number | null>(null);
-  const isPotentialTap = useRef(false);
-  const movementAccumulated = useRef({ dx: 0, dy: 0 });
 
   const onMoveRef = useRef(onMove);
-  const onTapRef = useRef(onTap);
 
   useEffect(() => {
     onMoveRef.current = onMove;
-    onTapRef.current = onTap;
-  }, [onMove, onTap]);
+  }, [onMove]);
 
   useEffect(() => {
     if (disabled) {
@@ -43,61 +38,22 @@ export function useTouchIndicatorTracking({
       return;
     }
 
-    if (msg.phase === 'start' || msg.phase === 'tap') {
+    if (msg.phase === 'start') {
       if (!isInitialized.current) {
         isInitialized.current = true;
         logger.debug('Tracking initialized');
       }
+      setPhase('start');
+      return;
+    }
 
-      if (msg.phase === 'start') {
-        tapStartTime.current = Date.now();
-        isPotentialTap.current = true;
-        movementAccumulated.current = { dx: 0, dy: 0 };
-        return;
-      }
-
-      if (msg.phase === 'tap') {
-        logger.debug('Tap phase:', {
-          isPotentialTap: isPotentialTap.current,
-          tapStartTime: tapStartTime.current,
-          elapsed: tapStartTime.current ? Date.now() - tapStartTime.current : 0,
-          totalMovement: Math.sqrt(
-            movementAccumulated.current.dx ** 2 + movementAccumulated.current.dy ** 2
-          ),
-        });
-        const elapsed = tapStartTime.current ? Date.now() - tapStartTime.current : 0;
-        const totalMovement = Math.sqrt(
-          movementAccumulated.current.dx ** 2 + movementAccumulated.current.dy ** 2
-        );
-        if (
-          isPotentialTap.current &&
-          elapsed >= tapDelay &&
-          totalMovement <= tapMovementThreshold
-        ) {
-          logger.debug('Tap detected');
-          setIsTapping(true);
-          onTapRef.current?.();
-          setTimeout(() => setIsTapping(false), rippleDuration);
-        }
-        tapStartTime.current = null;
-        isPotentialTap.current = false;
-        movementAccumulated.current = { dx: 0, dy: 0 };
-      }
+    if (msg.phase === 'tap') {
+      setPhase('tap');
       return;
     }
 
     if (msg.phase === 'move') {
-      movementAccumulated.current.dx += msg.dx;
-      movementAccumulated.current.dy += msg.dy;
-
-      const totalMovement = Math.sqrt(
-        movementAccumulated.current.dx ** 2 + movementAccumulated.current.dy ** 2
-      );
-
-      if (totalMovement > tapMovementThreshold) {
-        isPotentialTap.current = false;
-        tapStartTime.current = null;
-      }
+      setPhase('move');
 
       const scaled = applySensitivity(msg.dx, msg.dy, sensitivity);
 
@@ -123,11 +79,11 @@ export function useTouchIndicatorTracking({
         return clamped;
       });
     }
-  }, [message, disabled, sensitivity, size, rippleDuration, tapDelay, tapMovementThreshold]);
+  }, [message, disabled, sensitivity, size]);
 
   return {
     position,
-    isTapping,
+    phase,
     isInitialized: isInitialized.current,
   };
 }
