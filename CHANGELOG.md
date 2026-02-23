@@ -1,3 +1,10 @@
+## [1.1.8](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.7...v1.1.8) (2026-02-23)
+
+
+### Bug Fixes
+
+* memory overflow ([#2](https://github.com/stephen-boynton/touch-indcator/issues/2)) ([fe75680](https://github.com/stephen-boynton/touch-indcator/commit/fe756804204b8e3de530823fcc5c98043ea9ac39))
+
 ## [1.1.7](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.6...v1.1.7) (2026-02-23)
 
 
