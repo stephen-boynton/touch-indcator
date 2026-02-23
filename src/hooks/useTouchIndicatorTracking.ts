@@ -24,6 +24,14 @@ export function useTouchIndicatorTracking({
   const isPotentialTap = useRef(false);
   const movementAccumulated = useRef({ dx: 0, dy: 0 });
 
+  const onMoveRef = useRef(onMove);
+  const onTapRef = useRef(onTap);
+
+  useEffect(() => {
+    onMoveRef.current = onMove;
+    onTapRef.current = onTap;
+  }, [onMove, onTap]);
+
   useEffect(() => {
     if (disabled) {
       logger.debug('Tracking disabled');
@@ -68,7 +76,7 @@ export function useTouchIndicatorTracking({
         ) {
           logger.debug('Tap detected');
           setIsTapping(true);
-          onTap?.();
+          onTapRef.current?.();
           setTimeout(() => setIsTapping(false), rippleDuration);
         }
         tapStartTime.current = null;
@@ -110,22 +118,12 @@ export function useTouchIndicatorTracking({
         );
 
         logger.debug('Position updated:', clamped);
-        onMove?.(clamped);
+        onMoveRef.current?.(clamped);
 
         return clamped;
       });
     }
-  }, [
-    message,
-    disabled,
-    sensitivity,
-    size,
-    rippleDuration,
-    tapDelay,
-    tapMovementThreshold,
-    onTap,
-    onMove,
-  ]);
+  }, [message, disabled, sensitivity, size, rippleDuration, tapDelay, tapMovementThreshold]);
 
   return {
     position,
