@@ -1,3 +1,10 @@
+## [1.1.9](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.8...v1.1.9) (2026-02-23)
+
+
+### Bug Fixes
+
+* z-index ([#3](https://github.com/stephen-boynton/touch-indcator/issues/3)) ([07155f8](https://github.com/stephen-boynton/touch-indcator/commit/07155f8a85784cb2ec814e4409ab68691a1680fb))
+
 ## [1.1.8](https://github.com/stephen-boynton/touch-indcator/compare/v1.1.7...v1.1.8) (2026-02-23)
 
 
