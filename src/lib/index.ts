@@ -95,6 +95,7 @@ export function getIndicatorStyle({
   style?: React.CSSProperties;
 }): React.CSSProperties {
   return {
+    zIndex: 9999,
     ...style,
     ...positionStyle,
     width: visual.size,
