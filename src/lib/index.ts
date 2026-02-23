@@ -103,6 +103,7 @@ export function getIndicatorStyle({
     borderRadius: '50%',
     backgroundColor: visual.color,
     pointerEvents: 'none',
+    zIndex: 9999,
     willChange: 'left, top, opacity, transform',
   };
 }
